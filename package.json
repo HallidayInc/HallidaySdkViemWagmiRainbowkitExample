@@ -1,0 +1,23 @@
+{
+  "name": "halliday-sdk-rainbowkit-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@halliday-sdk/payments": "3.1.0",
+    "@rainbow-me/rainbowkit": "^2.2.11",
+    "@tanstack/react-query": "^5.100.11",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "viem": "^2.49.3",
+    "wagmi": "^2.19.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "vite": "^8.0.12"
+  }
+}

@@ -1,4 +1,4 @@
-# Halliday Wagmi Rainbowkit Example
+# Halliday SDK Wagmi Rainbowkit Example
 
 Run the Halliday SDK widget using a Wagmi Rainbowkit provider initialized on the page before opening the widget.
 

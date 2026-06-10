@@ -40,7 +40,10 @@ export default function App() {
   const onConnect = openAccountModal || openConnectModal
 
   const onDeposit = () =>
-    openHallidayPayments({ userWallet, destinationAddress: address })
+    openHallidayPayments({
+      userWallet,
+      destinationAddress: address
+    })
 
   const onWithdraw = () =>
     // Note this cannot be properly called until a userWallet, funder or owner 

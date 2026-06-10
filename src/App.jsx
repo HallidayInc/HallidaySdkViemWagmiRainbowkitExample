@@ -43,6 +43,8 @@ export default function App() {
     openHallidayPayments({ userWallet, destinationAddress: address })
 
   const onWithdraw = () =>
+    // Note this cannot be properly called until a userWallet, funder or owner 
+    // is provided to initializeClient or openHallidayPayments
     openWithdraw({
       withdrawInputs: tokens,
       withdrawFunder: userWallet,

@@ -1,67 +1,64 @@
 import { useEffect } from 'react'
 import { useAccount, useWalletClient } from 'wagmi'
 import { useConnectModal, useAccountModal } from '@rainbow-me/rainbowkit'
-import {
-  openHallidayPayments,
-  openWithdraw,
-  openActivity,
-  initializeClient,
-} from '@halliday-sdk/payments'
+import { useHallidayPayments } from '@halliday-sdk/payments/react'
 import { connectWalletClient } from '@halliday-sdk/payments/viem'
 
-const HALLIDAY_API_KEY = import.meta.env.VITE_HALLIDAY_API_KEY
+function HallidayEventLogger() {
+  const { instance } = useHallidayPayments()
 
-if (!HALLIDAY_API_KEY) {
-  alert('HALLIDAY_API_KEY is missing!');
+  useEffect(() => {
+    const offStatus = instance.on('status', (s) => console.log(`status: ${s.type}`))
+    const offError = instance.on('error', (e) => console.log(`error (${e.source}): ${e.message}`))
+    const offClose = instance.on('close', () => console.log('widget closed'))
+
+    return () => {
+      offStatus()
+      offError()
+      offClose()
+    }
+  }, [instance])
+
+  return null
 }
-
-const tokens = [
-  'base:0x',
-  'base:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
-]
 
 export default function App() {
   const { address, isConnected } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
+  const { openDeposit, openWithdrawal, openActivity, updateWallets, isReady } =
+    useHallidayPayments()
+
+  const enabled = isConnected && !!walletClient && isReady
 
   useEffect(() => {
-    initializeClient({
-      apiKey: HALLIDAY_API_KEY,
-      outputs: tokens,
-      onReady: () => console.log('Halliday preloaded and ready'),
-      onError: (error) => console.error('Halliday init error:', error),
+    if (!enabled) return
+    const owner = connectWalletClient(() => walletClient)
+
+    updateWallets({
+      owner,
+      deposit: { funders: [owner], destinationAddress: address },
+      withdrawal: { funder: owner },
     })
-  }, [])
-
-  const enabled = isConnected && !!walletClient
-  const userWallet = walletClient ? connectWalletClient(() => walletClient) : null
-  const onConnect = openAccountModal || openConnectModal
-
-  const onDeposit = () =>
-    openHallidayPayments({
-      userWallet,
-      destinationAddress: address
-    })
-
-  const onWithdraw = () =>
-    // Note this cannot be properly called until a userWallet, funder or owner 
-    // is provided to initializeClient or openHallidayPayments
-    openWithdraw({
-      withdrawInputs: tokens,
-      withdrawFunder: userWallet,
-    })
-
-  const onActivity = () => openActivity()
+  }, [enabled, walletClient, address])
 
   return (
     <div className="halliday-container">
+      <HallidayEventLogger />
       <h1>Halliday SDK Wagmi Rainbowkit Example</h1>
-      <button onClick={onConnect}>Connect</button>
-      <button disabled={!enabled} onClick={onDeposit}>Deposit with Halliday</button>
-      <button disabled={!enabled} onClick={onWithdraw}>Withdraw</button>
-      <button disabled={!enabled} onClick={onActivity}>Activity</button>
+      <button onClick={openAccountModal || openConnectModal}>
+        {address ? 'Account' : 'Connect wallet'}
+      </button>
+      <button disabled={!enabled} onClick={openDeposit}>
+        Deposit with Halliday
+      </button>
+      <button disabled={!enabled} onClick={openWithdrawal}>
+        Withdraw
+      </button>
+      <button disabled={!enabled} onClick={openActivity}>
+        Activity
+      </button>
     </div>
   )
 }

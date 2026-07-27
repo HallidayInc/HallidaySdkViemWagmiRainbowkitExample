@@ -11,7 +11,7 @@ Get a free [Halliday API key](https://dashboard.halliday.xyz) now.
 Create a `.env` file in the project root with your API keys:
 
 ```
-VITE_REOWN_PROJECT_ID=your_reown_project_id
+VITE_WALLETCONNECT_PROJECT_ID=your_reown_project_id
 VITE_HALLIDAY_API_KEY=your_halliday_api_key
 ```
 
